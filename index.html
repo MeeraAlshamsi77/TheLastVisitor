@@ -1,0 +1,733 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>THE LAST VISITOR</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono&family=Instrument+Serif:ital@0;1&display=swap');
+
+:root {
+  --pink: #e6b2b2;
+  --red: #a63c52;
+  --bg: #08080d;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: #f5e6e6;
+  font-family: "Instrument Serif", Georgia, serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    #ffffff09 4px
+  );
+  pointer-events: none;
+  z-index: 50;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 25px 5%;
+  border-bottom: 1px solid #ffffff20;
+  font: 11px "DM Mono", monospace;
+  letter-spacing: 2px;
+  color: #a9919d;
+}
+
+#counter { color: #f0b1b1; }
+
+main {
+  text-align: center;
+  padding: 50px 5% 40px;
+}
+
+.label {
+  font: 11px "DM Mono", monospace;
+  letter-spacing: 4px;
+  color: #bc929e;
+}
+
+h1 {
+  font-weight: normal;
+  font-size: clamp(65px, 11vw, 160px);
+  letter-spacing: -5px;
+  line-height: .85;
+  margin: 35px 0;
+}
+
+h1 em { color: #e5b5b9; }
+
+#subtitle {
+  font-size: clamp(22px, 3vw, 34px);
+  font-style: italic;
+  color: #e6b8c3;
+  min-height: 50px;
+}
+
+#artwork {
+  position: relative;
+  width: min(100%, 1000px);
+  height: 460px;
+  margin: 25px auto;
+  background: radial-gradient(
+    ellipse at center,
+    #38233f,
+    #161020 55%,
+    #08080d
+  );
+  border: 1px solid #c58d9b50;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+#artwork::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 110px #08080d;
+  pointer-events: none;
+  z-index: 10;
+}
+
+#orb {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 300px;
+  height: 300px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 40% 35%,
+    #fff0d6 0%,
+    #edb3b3 14%,
+    #bd80ac 35%,
+    #604376 58%,
+    transparent 73%
+  );
+  box-shadow:
+    0 0 90px #d88cba60,
+    0 0 190px #b3578c30;
+  animation: breathe 6s ease-in-out infinite alternate;
+  transition: opacity 1s, filter 1s;
+}
+
+.orbit {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid #ecc7db65;
+  border-radius: 50%;
+  transition: opacity 1s;
+}
+
+.orbit.one { width: 380px; height: 380px; }
+.orbit.two {
+  width: 520px;
+  height: 520px;
+  border-style: dashed;
+}
+.orbit.three { width: 680px; height: 680px; opacity: .3; }
+
+.memory {
+  position: absolute;
+  font-size: 23px;
+  font-style: italic;
+  color: #f3d4d5a0;
+  transition: opacity 1s, transform 1s;
+  z-index: 4;
+}
+
+.m1 { top: 15%; left: 12%; }
+.m2 { top: 20%; right: 12%; }
+.m3 { bottom: 17%; left: 15%; }
+.m4 { bottom: 15%; right: 12%; }
+.m5 { top: 52%; left: 7%; }
+.m6 { top: 57%; right: 7%; }
+
+.tear {
+  position: absolute;
+  background: #08080d;
+  opacity: 0;
+  transition: opacity .7s;
+  z-index: 6;
+  transform: skew(-15deg);
+}
+
+.t1 { top: 15%; left: 34%; width: 36%; height: 8%; }
+.t2 { top: 37%; left: 3%; width: 40%; height: 14%; }
+.t3 { top: 64%; right: 3%; width: 45%; height: 9%; }
+.t4 { top: 78%; left: 22%; width: 52%; height: 8%; }
+.t5 { top: 10%; right: 13%; width: 14%; height: 52%; }
+.t6 { top: 53%; left: 43%; width: 15%; height: 35%; }
+
+#eye {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  transform: translate(-50%, -50%);
+  width: 170px;
+  height: 85px;
+  border-radius: 50%;
+  background: #eab5ad;
+  opacity: 0;
+  overflow: hidden;
+  z-index: 8;
+  box-shadow: 0 0 70px #a62c49;
+  transition: opacity 1s;
+  animation: eyeMove 5s ease-in-out infinite;
+}
+
+#eye::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 67px;
+  height: 67px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    #040307 0 36%,
+    #922a47 39% 60%,
+    #211019 65%
+  );
+}
+
+#eye::after {
+  content: "";
+  position: absolute;
+  left: 42%;
+  top: 25%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: white;
+}
+
+#glitch {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  opacity: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 8px,
+      #ec718720 9px 11px
+    ),
+    linear-gradient(
+      90deg,
+      transparent 30%,
+      #dd334425 34%,
+      transparent 39%,
+      transparent 69%,
+      #6574dc25 72%,
+      transparent 75%
+    );
+  animation: glitchMove .16s steps(3) infinite;
+}
+
+#warning {
+  position: absolute;
+  top: 48%;
+  left: 0;
+  right: 0;
+  z-index: 11;
+  font: clamp(17px, 3vw, 30px) "DM Mono", monospace;
+  letter-spacing: 3px;
+  color: #ffa7ae;
+  text-shadow: 0 0 16px #e02251;
+  opacity: 0;
+}
+
+#poem {
+  max-width: 760px;
+  margin: 35px auto 15px;
+  min-height: 95px;
+  font-size: clamp(20px, 2.5vw, 29px);
+  line-height: 1.6;
+}
+
+.word {
+  display: inline-block;
+  margin-right: .25em;
+  transition: opacity .6s, filter .6s;
+}
+
+#caption {
+  font: 11px "DM Mono", monospace;
+  color: #ad8994;
+  letter-spacing: 1px;
+  min-height: 25px;
+}
+
+#meter {
+  height: 2px;
+  max-width: 550px;
+  margin: 25px auto;
+  background: #563b46;
+}
+
+#fill {
+  height: 100%;
+  width: 100%;
+  background: #e5a6a7;
+  transition: width .8s;
+}
+
+#stage {
+  font: 11px "DM Mono", monospace;
+  color: #a97e8b;
+  margin: 15px;
+}
+
+#controls {
+  max-width: 1000px;
+  margin: 45px auto 0;
+  padding-top: 25px;
+  border-top: 1px solid #ffffff25;
+}
+
+#controls h3 {
+  font: 12px "DM Mono", monospace;
+  color: #e0b4bf;
+  letter-spacing: 2px;
+}
+
+#controls p {
+  font: 11px "DM Mono", monospace;
+  color: #82717d;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 22px;
+}
+
+button {
+  cursor: pointer;
+  background: #17121c;
+  color: #e4c7cb;
+  border: 1px solid #624a58;
+  padding: 11px 15px;
+  font: 12px "DM Mono", monospace;
+  transition: all .2s;
+}
+
+button:hover, button.active {
+  background: #e4b2b4;
+  color: #180e16;
+}
+
+#ending {
+  display: none;
+  min-height: 85vh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 30px;
+}
+
+#ending h2 {
+  font-weight: normal;
+  font-size: clamp(40px, 8vw, 95px);
+  line-height: 1.1;
+}
+
+#ending em { color: #c68b92; }
+
+#ending p {
+  font: 12px "DM Mono", monospace;
+  color: #76616b;
+  letter-spacing: 2px;
+}
+
+#ending button { margin-top: 50px; }
+
+.flicker { animation: flicker 2s infinite; }
+.shake { animation: shake .12s infinite; }
+
+@keyframes breathe {
+  from { transform: translate(-50%, -50%) scale(.88); }
+  to { transform: translate(-50%, -50%) scale(1.07); }
+}
+
+@keyframes eyeMove {
+  0%, 100% { transform: translate(-50%, -50%); }
+  50% { transform: translate(-44%, -50%); }
+}
+
+@keyframes glitchMove {
+  to { transform: translate(7px, -4px); }
+}
+
+@keyframes flicker {
+  0%, 88%, 94%, 100% { opacity: 1; }
+  90%, 96% { opacity: .25; }
+}
+
+@keyframes shake {
+  0% { transform: translate(0, 0); }
+  50% { transform: translate(2px, -1px); }
+}
+
+@media(max-width: 700px) {
+  header { font-size: 9px; }
+  h1 { letter-spacing: -2px; }
+  #artwork { height: 340px; }
+  #orb { width: 220px; height: 220px; }
+  .orbit.one { width: 270px; height: 270px; }
+  .orbit.two { width: 370px; height: 370px; }
+  .orbit.three { width: 450px; height: 450px; }
+  .memory { font-size: 16px; }
+}
+
+@media(prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <span>ARCHIVE 001 / A FINITE EXPERIENCE</span>
+  <span id="counter">100 REMAIN</span>
+</header>
+
+<main id="experience">
+  <div class="label" id="overline">
+    THIS PLACE WILL NOT LAST
+  </div>
+
+  <h1 id="title">THE LAST<br><em>VISITOR</em></h1>
+
+  <div id="subtitle">Everything is still here.</div>
+
+  <div id="artwork">
+    <div class="orbit one"></div>
+    <div class="orbit two"></div>
+    <div class="orbit three"></div>
+    <div id="orb"></div>
+
+    <span class="memory m1">I remember</span>
+    <span class="memory m2">the first light</span>
+    <span class="memory m3">we were here</span>
+    <span class="memory m4">once</span>
+    <span class="memory m5">a soft place</span>
+    <span class="memory m6">to disappear</span>
+
+    <div class="tear t1"></div>
+    <div class="tear t2"></div>
+    <div class="tear t3"></div>
+    <div class="tear t4"></div>
+    <div class="tear t5"></div>
+    <div class="tear t6"></div>
+
+    <div id="eye"></div>
+    <div id="glitch"></div>
+    <div id="warning">IT KNOWS YOU ARE HERE</div>
+  </div>
+
+  <div id="poem"></div>
+
+  <div id="caption">
+    EVERY VISITOR TAKES SOMETHING THAT CANNOT BE RETURNED.
+  </div>
+
+  <div id="meter"><div id="fill"></div></div>
+
+  <div id="stage">PREVIEWING VISITOR 0 / 100</div>
+
+  <section id="controls">
+    <h3>CLASSROOM / TIME MACHINE</h3>
+    <p>
+      Select a visitor number to witness the artwork's decay.
+      This is a simulation, not a live visitor counter.
+    </p>
+
+    <div class="buttons">
+      <button data-visitor="1">1</button>
+      <button data-visitor="10">10</button>
+      <button data-visitor="20">20</button>
+      <button data-visitor="30">30</button>
+      <button data-visitor="40">40</button>
+      <button data-visitor="50">50</button>
+      <button data-visitor="60">60</button>
+      <button data-visitor="70">70</button>
+      <button data-visitor="80">80</button>
+      <button data-visitor="90">90</button>
+      <button data-visitor="100">100</button>
+      <button id="next">NEXT +1</button>
+      <button id="sound">SOUND OFF</button>
+      <button id="reset">RESET</button>
+    </div>
+  </section>
+</main>
+
+<section id="ending">
+  <div class="label">VISITOR 100 / END OF ARCHIVE</div>
+  <h2>You were here.<br><em>Now nothing is.</em></h2>
+  <p>THERE IS NOTHING LEFT FOR THE NEXT PERSON.</p>
+  <button id="restart">RESTART SIMULATION</button>
+</section>
+
+<script>
+const $ = id => document.getElementById(id);
+
+let visits = 0;
+let soundEnabled = false;
+let audioContext = null;
+
+const poem = (
+  "We thought we could keep everything here forever. " +
+  "We forgot that even looking can leave a mark."
+).split(" ");
+
+const states = [
+  [0, "Everything is still here.",
+   "EVERY VISITOR TAKES SOMETHING THAT CANNOT BE RETURNED.",
+   "THIS PLACE WILL NOT LAST"],
+
+  [1, "One of us has already gone.",
+   "A SINGLE MEMORY HAS BEEN REMOVED.",
+   "SOMEONE WAS HERE BEFORE YOU"],
+
+  [10, "Did you see something move?",
+   "SOMETHING SMALL IS MISSING.",
+   "THE ROOM IS CHANGING"],
+
+  [20, "It used to be brighter.",
+   "THE COLORS ARE BEGINNING TO FORGET.",
+   "DON'T STAY TOO LONG"],
+
+  [30, "You are not the first to find this.",
+   "PARTS OF THE ARCHIVE ARE UNRECOVERABLE.",
+   "THIS IS NOT A GLITCH"],
+
+  [40, "Something is behind the image.",
+   "THE DAMAGE CAN NO LONGER BE HIDDEN.",
+   "ARE YOU STILL WATCHING?"],
+
+  [50, "Please stop looking.",
+   "HALF THE VISITORS HAVE ALREADY COME.",
+   "IT CAN SEE YOU NOW"],
+
+  [60, "I don't remember my own beginning.",
+   "THE ORIGINAL IS NO LONGER ACCESSIBLE.",
+   "WHO IS LEFT INSIDE?"],
+
+  [70, "It remembers you, though.",
+   "THE IMAGE IS LOOKING BACK.",
+   "YOUR PRESENCE HAS A COST"],
+
+  [80, "There should not be anyone here.",
+   "THE ARCHIVE IS NEAR COLLAPSE.",
+   "DO NOT REFRESH"],
+
+  [90, "YOU ARE NOT SUPPOSED TO BE HERE.",
+   "TEN VISITS UNTIL NOTHING.",
+   "I CAN STILL SEE YOU"]
+];
+
+function getState(n) {
+  return [...states].reverse().find(s => n >= s[0]);
+}
+
+function playSound() {
+  if (!soundEnabled) return;
+
+  try {
+    audioContext = audioContext ||
+      new (window.AudioContext || window.webkitAudioContext)();
+
+    if (audioContext.state === "suspended") {
+      audioContext.resume();
+    }
+
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    const now = audioContext.currentTime;
+
+    oscillator.type = visits >= 60 ? "sawtooth" : "sine";
+    oscillator.frequency.value = Math.max(45, 220 - visits * 1.5);
+
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.045, now + 0.06);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.85);
+
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+
+    oscillator.start(now);
+    oscillator.stop(now + 0.86);
+  } catch (error) {
+    console.warn("Audio unavailable:", error);
+  }
+}
+
+function render() {
+  const n = Math.max(0, Math.min(100, visits));
+  const stage = Math.floor(n / 10);
+
+  $("counter").textContent = (100 - n) + " REMAIN";
+  $("fill").style.width = (100 - n) + "%";
+  $("stage").textContent = "PREVIEWING VISITOR " + n + " / 100";
+
+  if (n === 100) {
+    $("experience").style.display = "none";
+    $("ending").style.display = "flex";
+    playSound();
+    return;
+  }
+
+  $("experience").style.display = "block";
+  $("ending").style.display = "none";
+
+  const state = getState(n);
+  $("subtitle").textContent = state[1];
+  $("caption").textContent = state[2];
+  $("overline").textContent = state[3];
+
+  // The artwork loses brightness and color.
+  const saturation = Math.max(0, 100 - n * 1.2);
+  const contrast = 100 + n * 0.9;
+
+  $("artwork").style.filter =
+    `saturate(${saturation}%) contrast(${contrast}%)`;
+
+  // The glowing orb fades.
+  $("orb").style.opacity = Math.max(0.05, 1 - n / 100);
+  $("orb").style.filter =
+    `blur(${Math.max(0, n - 35) / 6}px)`;
+
+  // Memories disappear one by one.
+  const thresholds = [12, 23, 36, 46, 57, 67];
+
+  document.querySelectorAll(".memory").forEach((element, i) => {
+    const gone = n >= thresholds[i];
+    element.style.opacity = gone ? 0 : 1;
+    element.style.transform = gone
+      ? "translateY(-20px)"
+      : "translateY(0)";
+  });
+
+  // The orbiting lines fade away.
+  document.querySelectorAll(".orbit").forEach((element, i) => {
+    element.style.opacity =
+      Math.max(0, 1 - n / (35 + i * 20));
+  });
+
+  // Black tears increasingly damage the image.
+  document.querySelectorAll(".tear").forEach((element, i) => {
+    element.style.opacity =
+      n >= 26 + i * 11 ? Math.min(0.98, 0.4 + n / 120) : 0;
+  });
+
+  // The eye emerges.
+  $("eye").style.opacity = n < 65
+    ? 0
+    : Math.min(0.95, (n - 65) / 25);
+
+  // Glitch intensity increases.
+  $("glitch").style.opacity = n < 50
+    ? 0
+    : Math.min(0.9, (n - 50) / 45);
+
+  // The artwork begins speaking to the viewer.
+  $("warning").textContent =
+    n >= 90 ? "WHY DID YOU COME BACK?" :
+    n >= 75 ? "IT KNOWS YOU ARE HERE" :
+    "DO NOT LOOK AWAY";
+
+  $("warning").style.opacity =
+    n >= 80 ? 0.9 : n >= 60 ? 0.35 : 0;
+
+  // Words disappear and become corrupted.
+  $("poem").innerHTML = poem.map((word, i) => {
+    const gone = ((i * 37 + 23) % 101) < n;
+    const corrupted =
+      n >= 55 && !gone && ((i * 19 + 7) % 100) < n - 35;
+
+    const displayed = corrupted
+      ? "█".repeat(Math.min(word.length, 6))
+      : word;
+
+    const blur = n > 38 && !gone ? (n - 38) / 34 : 0;
+
+    return `<span class="word"
+      style="opacity:${gone ? 0 : 1};filter:blur(${blur}px)">
+      ${displayed}
+    </span>`;
+  }).join(" ");
+
+  $("title").classList.toggle("flicker", n >= 60);
+  $("artwork").classList.toggle("shake", n >= 85);
+
+  document.querySelectorAll("[data-visitor]").forEach(button => {
+    button.classList.toggle(
+      "active",
+      Number(button.dataset.visitor) === n
+    );
+  });
+
+  playSound();
+}
+
+document.querySelectorAll("[data-visitor]").forEach(button => {
+  button.addEventListener("click", () => {
+    visits = Number(button.dataset.visitor);
+    render();
+  });
+});
+
+$("next").addEventListener("click", () => {
+  visits = Math.min(100, visits + 1);
+  render();
+});
+
+$("reset").addEventListener("click", () => {
+  visits = 0;
+  render();
+});
+
+$("restart").addEventListener("click", () => {
+  visits = 0;
+  render();
+});
+
+$("sound").addEventListener("click", () => {
+  soundEnabled = !soundEnabled;
+  $("sound").textContent = soundEnabled ? "SOUND ON" : "SOUND OFF";
+  if (soundEnabled) playSound();
+});
+
+render();
+</script>
+
+</body>
+</html>
